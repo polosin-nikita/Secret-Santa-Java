@@ -1,10 +1,7 @@
-import com.vk.api.sdk.client.*;
-import com.vk.api.sdk.client.actors.UserActor;
-import com.vk.api.sdk.exceptions.ApiException;
-import com.vk.api.sdk.exceptions.ClientException;
-import com.vk.api.sdk.httpclient.*;
-import com.vk.api.sdk.objects.*;
-import org.json.*;
+package ru.polosin;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,23 +12,14 @@ import java.util.*;
 
 
 public class SecretSanta {
-    String nameCompany;
-    Integer groupId;
-    String accessToken = "35482a0475db2306458e0fc484fd120a17160aa6f2e06ec6f47ce3c8ca73f8fa97b6ef01796c289b76242";
-    List<Member> members;
-    Boolean verification = true;
+    private Integer groupId;
+    private String accessToken = "35482a0475db2306458e0fc484fd120a17160aa6f2e06ec6f47ce3c8ca73f8fa97b6ef01796c289b76242";
+    private List<Member> members;
+    private Boolean verification = true;
 
-    public SecretSanta() {
-        this.nameCompany = "";
-
-
+    private SecretSanta() {
     }
 
-    public SecretSanta(String nameCompany) {
-        this.nameCompany = nameCompany;
-
-
-    }
 
     public class Member {
         Integer id;
@@ -39,7 +27,7 @@ public class SecretSanta {
         int santa;
         int spouse;
 
-        public Member(Integer id, String contact, int spouse) {
+        private Member(Integer id, String contact, int spouse) {
             this.id = id;
             this.contact = contact;
             this.spouse = spouse;
@@ -47,7 +35,7 @@ public class SecretSanta {
 
     }
 
-    public String makeUrlRequest(String url) throws IOException {
+    private String makeUrlRequest(String url) throws IOException {
         URLConnection connection = new URL(url).openConnection();
 
         InputStream is = connection.getInputStream();
@@ -61,7 +49,7 @@ public class SecretSanta {
         return sb.toString();
     }
 
-    public void addMembers(Integer groupId) throws IOException {
+    private void addMembers(Integer groupId) throws IOException {
         this.groupId = groupId;
 
         Map<Integer, Integer> spouses = new HashMap<Integer, Integer>();
@@ -90,7 +78,7 @@ public class SecretSanta {
         this.members = members;
     }
 
-    public void verifyMembers(SecretSanta secretSanta) throws IOException {
+    private void verifyMembers(SecretSanta secretSanta) throws IOException {
 
         for (Member member : secretSanta.members) {
             String url = "https://api.vk.com/method/messages.isMessagesFromGroupAllowed?group_id="
@@ -107,8 +95,8 @@ public class SecretSanta {
 
     }
 
-    public void selectSanta() {
-        Boolean attempt = true;
+    private void selectSanta() {
+        boolean attempt = true;
         Random random = new Random();
         int numAttempt = 1;
         //Create array of santa
@@ -157,7 +145,7 @@ public class SecretSanta {
 
     }
 
-    public void send() throws IOException {
+    private void send() throws IOException {
         for (Member member : this.members) {
             String urlSantaInfo = "https://api.vk.com/method/users.get?user_id=" + member.santa + "&fields=contacts&access_token=362662e4758a62725f593f6c6c27aaa86892f428bbf135b6a42a726862ee4380039df6147dcd66105f2e4&v=5.87";
             JSONObject obj = new JSONObject(makeUrlRequest(urlSantaInfo));
@@ -176,7 +164,7 @@ public class SecretSanta {
         }
     }
 
-    public static void main(String[] args) throws ClientException, ApiException, IOException {
+    public static void main(String[] args) throws IOException {
 
         SecretSanta secretSanta = new SecretSanta();
         System.out.println("Добавление участников Тайного санты");
@@ -186,7 +174,7 @@ public class SecretSanta {
         }
         System.out.println("Проверка возможности отправлять сообщения участникам");
         secretSanta.verifyMembers(secretSanta);
-        if (secretSanta.verification == true) {
+        if (secretSanta.verification) {
             System.out.println("Проверка прошла успешно.");
             secretSanta.selectSanta();
 
